@@ -369,30 +369,100 @@ static MBAlertView *currentAlert;
         totalWidth += size.width + kSpaceBetweenButtons;
     }
     
-    totalWidth -= kSpaceBetweenButtons;
+    if (totalWidth > bounds.size.width) {
+        float widthLineOne = 0;
+        float widthLineTwo = 0;
+        BOOL nextLine = NO;
+        NSUInteger indexOfFirstItemInLineTwo = 0;
+        int count = 0;
+        for(MBAlertViewButton *item in _buttons) {
+            CGSize size = item.frame.size;
+            if (!nextLine && ((widthLineOne + size.width + kSpaceBetweenButtons) <= bounds.size.width)){
+                widthLineOne += size.width + kSpaceBetweenButtons;
+            }
+            else {
+                nextLine = YES;
+                indexOfFirstItemInLineTwo = count;
+                widthLineTwo += size.width + kSpaceBetweenButtons;
+            }
+            count++;
+        }
+        
+        widthLineOne -= kSpaceBetweenButtons;
+        widthLineTwo -= kSpaceBetweenButtons;
     
-    float xOrigOfFirstItem = bounds.size.width/2.0 - totalWidth/2.0;
-    __block float currentXOrigin = xOrigOfFirstItem;
+        float xOrigOfFirstItemInLineOne = bounds.size.width/2.0 - widthLineOne/2.0;
+        __block float currentXOriginInLineOne = xOrigOfFirstItemInLineOne;
+        float xOrigOfFirstItemInLineTwo = bounds.size.width/2.0 - widthLineTwo/2.0;
+        __block float currentXOriginInLineTwo = xOrigOfFirstItemInLineTwo;
     
-    [self.items enumerateObjectsUsingBlock:^(MBAlertViewItem *item, NSUInteger index, BOOL *stop)
-     {
-         MBAlertViewButton *buttonLabel = [_buttons objectAtIndex:index];
-         float origin = 0;
-         if(index == 0)
-             origin = currentXOrigin;
-         else origin = currentXOrigin + kSpaceBetweenButtons;
-         
-         currentXOrigin = origin + buttonLabel.bounds.size.width;
-         float yOrigin = _bodyLabelButton.frame.origin.y + _bodyLabelButton.frame.size.height ;
-
-         CGRect rect = buttonLabel.frame;
-         rect.origin = CGPointMake(origin, yOrigin);
-         buttonLabel.frame = rect;
-         buttonLabel.alertButtonType = item.type;
-         
-         if(!buttonLabel.superview)
-             [self.view addSubview:buttonLabel];
-     }];
+        [self.items enumerateObjectsUsingBlock:^(MBAlertViewItem *item, NSUInteger index, BOOL *stop)
+        {
+             if(index < indexOfFirstItemInLineTwo){
+                 MBAlertViewButton *buttonLabel = [_buttons objectAtIndex:index];
+                 float origin = 0;
+                 if(index == 0)
+                     origin = currentXOriginInLineOne;
+                 else origin = currentXOriginInLineOne + kSpaceBetweenButtons;
+                 
+                 currentXOriginInLineOne = origin + buttonLabel.bounds.size.width;
+                 float yOrigin = _bodyLabelButton.frame.origin.y + _bodyLabelButton.frame.size.height ;
+        
+                 CGRect rect = buttonLabel.frame;
+                 rect.origin = CGPointMake(origin, yOrigin);
+                 buttonLabel.frame = rect;
+                 buttonLabel.alertButtonType = item.type;
+             
+                 if(!buttonLabel.superview)
+                    [self.view addSubview:buttonLabel];
+                 }
+             else {
+                 MBAlertViewButton *buttonLabel = [_buttons objectAtIndex:index];
+                 float origin = 0;
+                 if(index == 0)
+                     origin = currentXOriginInLineTwo;
+                 else origin = currentXOriginInLineTwo + kSpaceBetweenButtons;
+                 
+                 currentXOriginInLineTwo = origin + buttonLabel.bounds.size.width;
+                 float yOrigin = _bodyLabelButton.frame.origin.y + 2 * _bodyLabelButton.frame.size.height + 10;
+        
+                 CGRect rect = buttonLabel.frame;
+                 rect.origin = CGPointMake(origin, yOrigin);
+                 buttonLabel.frame = rect;
+                 buttonLabel.alertButtonType = item.type;
+             
+                 if(!buttonLabel.superview)
+                    [self.view addSubview:buttonLabel];
+                 }
+             }
+        }];
+    }
+    else {
+        totalWidth -= kSpaceBetweenButtons;
+    
+        float xOrigOfFirstItem = bounds.size.width/2.0 - totalWidth/2.0;
+        __block float currentXOrigin = xOrigOfFirstItem;
+    
+        [self.items enumerateObjectsUsingBlock:^(MBAlertViewItem *item, NSUInteger index, BOOL *stop)
+        {
+             MBAlertViewButton *buttonLabel = [_buttons objectAtIndex:index];
+             float origin = 0;
+             if(index == 0)
+                 origin = currentXOrigin;
+             else origin = currentXOrigin + kSpaceBetweenButtons;
+             
+             currentXOrigin = origin + buttonLabel.bounds.size.width;
+             float yOrigin = _bodyLabelButton.frame.origin.y + _bodyLabelButton.frame.size.height ;
+    
+             CGRect rect = buttonLabel.frame;
+             rect.origin = CGPointMake(origin, yOrigin);
+             buttonLabel.frame = rect;
+             buttonLabel.alertButtonType = item.type;
+             
+             if(!buttonLabel.superview)
+                [self.view addSubview:buttonLabel];
+        }]; 
+    }
 }
 
 
