@@ -415,7 +415,7 @@ static MBAlertView *currentAlert;
              
                  if(!buttonLabel.superview)
                     [self.view addSubview:buttonLabel];
-                 }
+             }
              else {
                  MBAlertViewButton *buttonLabel = [_buttons objectAtIndex:index];
                  float origin = 0;
@@ -433,7 +433,6 @@ static MBAlertView *currentAlert;
              
                  if(!buttonLabel.superview)
                     [self.view addSubview:buttonLabel];
-                 }
              }
         }];
     }
